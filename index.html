@@ -43,7 +43,7 @@ input[type=range]{max-width:80px;}
  \___ \| |_    / /\ \
   ___) |  _|  / ____ \
  |____/|_|   /_/    \_\
-     S c i e n c e s   F o r   A l l</pre>
+     S c i e n c e   F o r   A l l</pre>
 
 <div id="vHome">
   <h1>Physique — théorie & exercices</h1>
@@ -110,6 +110,8 @@ function gv(id,d){var e=document.getElementById(id);return e?parseFloat(e.value)
 function P3(x,y,z,cx,cy,s){var ca=Math.cos(ORB.a),sa=Math.sin(ORB.a),cb=Math.cos(ORB.b),sb=Math.sin(ORB.b);
  var u=x*ca-y*sa,v=x*sa+y*ca;return {x:cx+s*u,y:cy-s*(z*cb+v*sb)};}
 function pivotTri(x,y){ctx.fillStyle=INK;ctx.beginPath();ctx.moveTo(x-15,y+24);ctx.lineTo(x+15,y+24);ctx.lineTo(x,y);ctx.closePath();ctx.fill();}
+function chg(x,y,r,sg){DOT(x,y,r,sg>0?'#fcebeb':'#e6f1fb');ctx.strokeStyle=sg>0?RED:BLUE;ctx.lineWidth=2.2;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.stroke();TB(sg>0?'+':'\u2212',x,y+r*.4,sg>0?DRED:BLUE_D,Math.round(r*1.15));}
+function xfield(x0,y0,x1,y1,st){ctx.strokeStyle='#b7bdc4';ctx.lineWidth=1.4;for(var x=x0;x<=x1;x+=st)for(var y=y0;y<=y1;y+=st){ctx.beginPath();ctx.moveTo(x-4,y-4);ctx.lineTo(x+4,y+4);ctx.moveTo(x+4,y-4);ctx.lineTo(x-4,y+4);ctx.stroke();}}
 
 /* ================= chapitres ================= */
 var CH=[
@@ -177,9 +179,14 @@ anim:function(t){if(!dragT)ORB.a+=.003;
  var c=[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
  var O=P3(0,0,0,cx,cy,s),Pa=P3(a[0],a[1],a[2],cx,cy,s),Pb=P3(b[0],b[1],b[2],cx,cy,s),Pab=P3(a[0]+b[0],a[1]+b[1],a[2]+b[2],cx,cy,s),Pc=P3(c[0],c[1],c[2],cx,cy,s);
  ctx.fillStyle='rgba(127,119,221,.13)';ctx.beginPath();ctx.moveTo(O.x,O.y);ctx.lineTo(Pa.x,Pa.y);ctx.lineTo(Pab.x,Pab.y);ctx.lineTo(Pb.x,Pb.y);ctx.closePath();ctx.fill();
+ var na2=a[0]*a[0]+a[1]*a[1]+a[2]*a[2],dab=a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+ if(na2>.01){var kp=dab/na2,Pp=P3(kp*a[0],kp*a[1],kp*a[2],cx,cy,s);
+  ctx.strokeStyle='rgba(216,90,48,.8)';ctx.lineWidth=7;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(O.x,O.y);ctx.lineTo(Pp.x,Pp.y);ctx.stroke();
+  LN(Pb.x,Pb.y,Pp.x,Pp.y,'rgba(216,90,48,.55)',1.4,[5,4]);
+  TB('projection de b̄ sur ā',Pp.x,Pp.y+24,ORA2,11);}
  A(O.x,O.y,Pa.x-O.x,Pa.y-O.y,BLUE,'ā',3);A(O.x,O.y,Pb.x-O.x,Pb.y-O.y,RED,'b̄',3);A(O.x,O.y,Pc.x-O.x,Pc.y-O.y,VIOLET,'ā×b̄',3);
  var dot=a[0]*b[0]+a[1]*b[1]+a[2]*b[2],nc=Math.sqrt(c[0]*c[0]+c[1]*c[1]+c[2]*c[2]);
- TB('ā·b̄ = '+dot.toFixed(1)+'   (un NOMBRE : projection)',W*.62,H*.2,BLUE_D,13,'left');
+ TB('ā·b̄ = '+dot.toFixed(1)+' = ‖ā‖ × (projection orange de b̄)',W*.62,H*.2,BLUE_D,13,'left');
  TB('‖ā×b̄‖ = '+nc.toFixed(2)+'   (aire violette)',W*.62,H*.2+24,VIOLET,13,'left');
  TB('ā×b̄ ⟂ au plan (règle de la main droite)',W*.62,H*.2+48,GREY,12,'left');
  TB('ā×b̄ = 0 si colinéaires ; ā·b̄ = 0 si ⟂',W*.62,H*.2+72,GREY,12,'left');},
@@ -520,7 +527,9 @@ anim:function(t){var x0=W*.07,gw=W*.86,om=.03;
  ctx.strokeStyle=RED;ctx.lineWidth=2.4;ctx.beginPath();
  for(var i=0;i<=gw;i+=2){var tau=t-(gw-i);var y=cy2-amp*Math.sin(k*(xm-x0)-om*tau);i?ctx.lineTo(x0+i,y):ctx.moveTo(x0+i,y);}ctx.stroke();
  DOT(x0+gw,cy2-amp*Math.sin(k*(xm-x0)-om*t),6,RED);
- var Tp=2*PI/om;LN(x0+gw*.12,cy2+amp+12,x0+gw*.12+Tp,cy2+amp+12,GREEN,1.8);TB('T',x0+gw*.12+Tp/2,cy2+amp+28,DGREEN,12);
+ var Tp=2*PI/om,Cph=(k*(xm-x0)-PI/2)/om,ib=(((gw-t+Cph)%Tp)+Tp)%Tp;while(ib<gw*.06)ib+=Tp;if(ib+Tp>gw)ib-=Tp;
+ LN(x0+ib,cy2-amp-6,x0+ib,cy2+amp+12,'rgba(29,158,117,.4)',1.2,[3,3]);LN(x0+ib+Tp,cy2-amp-6,x0+ib+Tp,cy2+amp+12,'rgba(29,158,117,.4)',1.2,[3,3]);
+ LN(x0+ib,cy2+amp+12,x0+ib+Tp,cy2+amp+12,GREEN,1.8);TB('T',x0+ib+Tp/2,cy2+amp+28,DGREEN,12);
  TB('lien entre les deux : v = λ/T = λ·f',W*.5,H*.98,GREY,12);},
 th:'<div class="tcard"><b class="h">Onde progressive.</b> <code>y(x,t) = A·sin(ωt − kx + φ)</code>. La partie SPATIALE : <code>k = 2π/λ</code> (photo à t fixé). La partie TEMPORELLE : <code>ω = 2πf = 2π/T</code> (un point fixé qui oscille). Lien : <code>v = λf = ω/k</code>. Changer sin↔cos ou les signes = changer la phase, rien d\u2019autre.</div>'+
 '<div class="tcard"><b class="h">Ondes stationnaires.</b> Incidente + réfléchie ⇒ <code>y = 2A·sin(kx)·cos(ωt)</code> : nœuds fixes, ventres. Corde fixée aux deux bouts : <code>λₙ = 2L/n</code>, <code>fₙ = n·f₁</code>. Vitesse sur une corde : <code>v = √(T/μ)</code>.</div>'+
@@ -557,27 +566,36 @@ ex:[
 ic:function(){ctx.strokeStyle=INK;ctx.lineWidth=2.4;ctx.strokeRect(W*.2,H*.2,W*.6,H*.62);ctx.fillStyle='rgba(55,138,221,.25)';ctx.fillRect(W*.2+2,H*.4,W*.6-4,H*.42-2);LN(W*.2+4,H*.4,W*.8-4,H*.4,BLUE,2);},
 anim:function(t){
  TB('Hydrostatique : P = P₀ + ρg·h',W*.06,H*.08,BLUE_D,12,'left');
- var lx=W*.07,rx=W*.38,ty=H*.18,by=H*.86,wy=H*.28;
- LN(lx,ty,lx,by,INK,2.2);LN(lx,by,rx,by,INK,2.2);LN(rx,ty,rx,by,INK,2.2);
- ctx.fillStyle='rgba(55,138,221,.18)';ctx.fillRect(lx+2,wy,rx-lx-4,by-wy-2);LN(lx+2,wy,rx-2,wy,BLUE,2);
- [.25,.55,.85].forEach(function(f){var y=wy+(by-wy)*f;A(lx+6,y,24+70*f,0,BLUE_D,'',2);});
- A(rx-18,wy,0,(by-wy)*.55,GREEN,'h',2);
- TB('la pression augmente avec h',W*.22,H*.95,GREY,11);
- TB('Bernoulli : p + ρgz + ½ρv² = cte',W*.52,H*.08,DGREEN,12,'left');
- var x0=W*.52,x1=W*.95,ym=H*.54,base=H*.15;
- function half(u){var s2=(u>.34&&u<.66)?(1-Math.cos((u-.34)/.32*2*PI))/2:0;return base*(1-.55*s2);}
+ var lx=W*.06,rx=W*.4,ty=H*.16,by=H*.88,wy=H*.26;
+ ctx.fillStyle='rgba(55,138,221,.16)';ctx.fillRect(lx,wy,rx-lx,by-wy);
+ LN(lx,ty,lx,by,INK,2.4);LN(lx,by,rx,by,INK,2.4);LN(rx,ty,rx,by,INK,2.4);
+ LN(lx,wy,rx,wy,BLUE,2);TB('P₀ (surface)',(lx+rx)/2,wy-8,GREY,10);
+ var Ppt={x:(lx+rx)/2,y:wy+(by-wy)*.62};
+ A(Ppt.x,wy+4,0,Ppt.y-wy-12,GREEN,'',2);TB('h',Ppt.x+14,(wy+Ppt.y)/2,DGREEN,12,'left');
+ DOT(Ppt.x,Ppt.y,5.5,RED);TB('P = P₀ + ρg·h',Ppt.x,Ppt.y+26,DRED,12);
+ [.3,.6,.9].forEach(function(f){var y=wy+(by-wy)*f,l2=16+46*f;A(rx-l2-8,y,l2,0,BLUE_D,'',2);});
+ TB('la pression pousse plus fort en bas',W*.23,H*.96,GREY,10);
+ TB('Bernoulli : p + ρgz + ½ρv² = cte',W*.5,H*.08,DGREEN,12,'left');
+ var x0=W*.5,x1=W*.95,yA=H*.72,yB=H*.32,h1=H*.1,h2=H*.045,gnd=H*.92;
+ function sm(u){return (1-Math.cos(PI*u))*.5;}
+ function cyl(u){return yA+(yB-yA)*sm(u);}
+ function hw(u){return h1+(h2-h1)*sm(u);}
  ctx.strokeStyle=INK;ctx.lineWidth=2.3;
- ctx.beginPath();for(var u=0;u<=1.0001;u+=.01){var x=x0+u*(x1-x0),y=ym-half(u);u>0?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();
- ctx.beginPath();for(var u=0;u<=1.0001;u+=.01){var x=x0+u*(x1-x0),y=ym+half(u);u>0?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();
- if(!window.FLP){window.FLP=[];for(var i=0;i<10;i++)window.FLP.push(i/10);}
- for(var i=0;i<window.FLP.length;i++){window.FLP[i]+=.0035*base/half(window.FLP[i]);if(window.FLP[i]>1)window.FLP[i]-=1;
-  var u=window.FLP[i];DOT(x0+u*(x1-x0),ym,4.5,half(u)<base*.75?RED:BLUE);}
- TB('section ↓ ⇒ v ↑ ⇒ p ↓',W*.735,ym-base-16,DRED,12);
- TB('continuité : S₁v₁ = S₂v₂',W*.735,H*.95,GREY,11);},
+ ctx.beginPath();for(var u=0;u<=1.0001;u+=.01){var x=x0+u*(x1-x0);u>0?ctx.lineTo(x,cyl(u)-hw(u)):ctx.moveTo(x,cyl(u)-hw(u));}ctx.stroke();
+ ctx.beginPath();for(var u=0;u<=1.0001;u+=.01){var x=x0+u*(x1-x0);u>0?ctx.lineTo(x,cyl(u)+hw(u)):ctx.moveTo(x,cyl(u)+hw(u));}ctx.stroke();
+ if(!window.FLP){window.FLP=[];for(var i=0;i<9;i++)window.FLP.push(i/9);}
+ for(var i=0;i<window.FLP.length;i++){window.FLP[i]+=.003*h1/hw(window.FLP[i]);if(window.FLP[i]>1)window.FLP[i]-=1;
+  var u=window.FLP[i];DOT(x0+u*(x1-x0),cyl(u),4.2,hw(u)<h1*.7?RED:BLUE);}
+ LN(W*.48,gnd,W*.97,gnd,AX,1.2,[5,4]);
+ LN(x0+8,gnd,x0+8,yA,GREEN,1.5,[4,3]);TB('z₁',x0+22,(gnd+yA)/2+4,DGREEN,11,'left');
+ LN(x1-8,gnd,x1-8,yB,GREEN,1.5,[4,3]);TB('z₂',x1-24,(gnd+yB)/2,DGREEN,11);
+ TB('S₁, v₁, p₁',x0+44,yA+h1+16,BLUE_D,11);
+ TB('S₂ < S₁ ⇒ v₂ > v₁',x1-76,yB-h2-10,DRED,11);},
 th:'<div class="tcard"><b class="h">Hydrostatique.</b> <code>P = P₀ + ρgh</code> : la pression croît avec la profondeur ; mêmes valeurs à même hauteur dans un fluide connecté. <b>Pascal</b> : une variation de pression se transmet partout (<code>F₂ = F₁·S₂/S₁</code>). <b>Archimède</b> : poussée = poids du fluide déplacé <code>= ρ_fluide·V_immergé·g</code>.</div>'+
 '<div class="tcard"><b class="h">Continuité.</b> Fluide incompressible : le débit <code>Q = S·v</code> se conserve. Section qui rétrécit ⇒ vitesse qui augmente.</div>'+
 '<div class="tcard"><b class="h">Bernoulli.</b> Sans viscosité, le long d\u2019une ligne de courant : <code>p + ρgz + ½ρv² = constante</code>. Réservoir (Torricelli) : <code>v = √(2gΔh)</code> si les pressions aux deux points sont égales.</div>'+
-'<div class="tcard"><b class="h">Poiseuille (fluide visqueux).</b> Dans un tube : <code>Q = πr⁴·Δp/(8ηℓ)</code>. Le rayon à la puissance 4 : un tube 2× plus fin ⇒ 16× moins de débit à Δp égal.</div>',
+'<div class="tcard"><b class="h">Poiseuille (fluide visqueux).</b> Dans un tube : <code>Q = πr⁴·Δp/(8ηℓ)</code>. Le rayon à la puissance 4 : un tube 2× plus fin ⇒ 16× moins de débit à Δp égal.</div>'+
+'<div class="tcard"><b class="h">Vitesse limite (chute dans un fluide).</b> Un objet qui tombe dans un fluide subit son poids, la poussée d\u2019Archimède et une force de frottement qui CROÎT avec la vitesse (ex. traînée de Stokes <code>F = 6πηr·v</code> pour une petite sphère). La vitesse augmente jusqu\u2019à ce que la résultante s\u2019annule : c\u2019est la <b>vitesse limite</b> <code>v_lim</code>, atteinte quand <code>poids = poussée + frottement</code>. À partir de là, a = 0 et la chute se fait à vitesse constante (goutte de pluie, parachutiste, bille dans l\u2019huile).</div>',
 ex:[
 {t:'Pression en profondeur',s:1,st:'Quelle est la pression absolue à <b>10 m</b> sous l\u2019eau (ρ = 1000 kg/m³, P₀ = 101,3 kPa) ?',
  d:function(){var lx=W*.26,rx=W*.74,ty=H*.14,by=H*.84;LN(lx,ty,lx,by,INK,2.2);LN(lx,by,rx,by,INK,2.2);LN(rx,ty,rx,by,INK,2.2);
@@ -628,6 +646,213 @@ ex:[
   for(var y=cy-44;y<cy+46;y+=4)LN(W*.47,y,W*.53,y,GREY,1);TB('N capillaires',W*.5,cy+62,GREY,11);
   LN(W*.7,cy,W*.94,cy,INK,5);TB('veine',W*.82,cy-16,GREY,11);},
  sol:'(a) Continuité : v_a·πr² = N·v_c·πr₀² ⇒ N = (15·0,5²)/(0,03·(5·10⁻⁴)²) = <b>5·10⁸ capillaires</b>. (b) ℓ₀ = v_c·10 s = 0,3 cm ⇒ V = N·πr₀²ℓ₀ ≈ <b>118 cm³</b> ; débit veine = débit artère = v_a·πr² ≈ <b>11,8 cm³/s</b>. (c) Poiseuille Δp = 8ηℓQ/(πr⁴) : artère ≈ <b>29 Pa</b> ; un capillaire (Q/N) ≈ <b>0,86 kPa</b> — c\u2019est dans les petits vaisseaux que la pression chute.'}
+]},
+
+/* ---------- 11. ELECTROSTATIQUE ---------- */
+{t:'Électrostatique',
+ic:function(){chg(W*.3,H*.5,H*.15,1);chg(W*.7,H*.5,H*.15,-1);
+ ctx.strokeStyle='#c8ccd0';ctx.lineWidth=1.6;[-H*.22,0,H*.22].forEach(function(dy){ctx.beginPath();ctx.moveTo(W*.3+H*.15,H*.5);ctx.quadraticCurveTo(W*.5,H*.5+dy*1.8,W*.7-H*.15,H*.5);ctx.stroke();});},
+anim:function(t){var d=W*(.17+.07*Math.sin(t*.02)),cx=W*.3;
+ var dn=d/(W*.17),L=Math.min(96,50/(dn*dn));
+ var y1=H*.28;chg(cx-d/2,y1,14,1);chg(cx+d/2,y1,14,1);
+ A(cx-d/2-18,y1,-L,0,ORA2,'F̄',2.4);A(cx+d/2+18,y1,L,0,ORA2,'F̄',2.4);
+ TB('mêmes signes : répulsion',cx,y1-42,GREY,12);
+ var y2=H*.72,La=Math.max(18,Math.min(L,d/2-30));
+ chg(cx-d/2,y2,14,1);chg(cx+d/2,y2,14,-1);
+ A(cx-d/2+18,y2,La,0,DGREEN,'F̄',2.4);A(cx+d/2-18,y2,-La,0,DGREEN,'F̄',2.4);
+ TB('signes opposés : attraction',cx,y2+46,GREY,12);
+ TB('Loi de Coulomb',W*.62,H*.16,BLUE_D,14,'left');
+ TB('F = k·|q₁·q₂| / r²',W*.62,H*.16+24,INK,13,'left');
+ TB('k = 9·10⁹ N·m²/C²',W*.62,H*.16+46,GREY,12,'left');
+ TB('rapprocher r ⇒ F explose (1/r²)',W*.62,H*.16+68,GREY,12,'left');
+ var Ec={x:W*.8,y:H*.66};chg(Ec.x,Ec.y,12,1);
+ for(var i2=0;i2<8;i2++){var aa=i2*PI/4;A(Ec.x+19*Math.cos(aa),Ec.y+19*Math.sin(aa),26*Math.cos(aa),26*Math.sin(aa),'#c98a8a','',1.7);}
+ TB('Ē sort du + : E = kQ/r²',Ec.x,Ec.y+64,GREY,11);},
+th:'<div class="tcard"><b class="h">Les charges.</b> Deux signes : + et −. Mêmes signes se repoussent, signes opposés s\u2019attirent. La charge est <b>quantifiée</b> : <code>q = n·e</code> avec <code>e = 1,6·10⁻¹⁹ C</code>, et elle se <b>conserve</b>.</div>'+
+'<div class="tcard"><b class="h">Loi de Coulomb.</b> <code>F = k·|q₁q₂|/r²</code> avec <code>k = 9·10⁹ N·m²/C²</code>, dirigée le long de la droite joignant les charges. Même forme en 1/r² que la gravitation — mais elle peut être attractive OU répulsive, et elle est énormément plus intense.</div>'+
+'<div class="tcard"><b class="h">Champ électrique.</b> <code>Ē = F̄/q</code> (en N/C ou V/m) : une charge Q crée autour d\u2019elle <code>E = kQ/r²</code>. Les lignes de champ SORTENT des charges + et ENTRENT dans les −. Une charge q placée dans le champ subit <code>F̄ = q·Ē</code>.</div>'+
+'<div class="tcard"><b class="h">Potentiel et énergie.</b> <code>V = kQ/r</code> (volts) ; travail du champ : <code>W = q·ΔV</code>. Champ uniforme (condensateur plan) : <code>E = U/d</code>.</div>',
+ex:[
+{t:'Compter les électrons',s:1,st:'Un ballon frotté porte une charge <b>q = −4,8 μC</b>. Combien d\u2019électrons en excès porte-t-il ? (e = 1,6·10⁻¹⁹ C)',
+ d:function(){DOT(W*.5,H*.5,H*.3,'#e6f1fb');ctx.strokeStyle=BLUE;ctx.lineWidth=2.4;ctx.beginPath();ctx.arc(W*.5,H*.5,H*.3,0,7);ctx.stroke();
+  for(var i=0;i<6;i++){var a=i*PI/3+.3;TB('\u2212',W*.5+H*.18*Math.cos(a),H*.5+H*.18*Math.sin(a)+5,BLUE_D,16);}
+  TB('q = −4,8 μC',W*.5,H*.93,GREY,12);},
+ sol:'n = |q|/e = 4,8·10⁻⁶ / 1,6·10⁻¹⁹ = <b>3·10¹³ électrons</b>. La charge est toujours un multiple entier de e.'},
+{t:'Loi de Coulomb',s:2,st:'Deux charges <b>q₁ = 2 μC</b> et <b>q₂ = 3 μC</b> sont à <b>r = 30 cm</b>. Calcule la force entre elles. Attractive ou répulsive ?',
+ d:function(){var y=H*.48;chg(W*.28,y,14,1);chg(W*.72,y,14,1);
+  A(W*.28-18,y,-64,0,ORA2,'F̄',2.4);A(W*.72+18,y,64,0,ORA2,'F̄',2.4);
+  LN(W*.28,y+42,W*.72,y+42,GREEN,1.5,[5,4]);TB('r = 30 cm',W*.5,y+60,DGREEN,12);},
+ sol:'F = k·q₁q₂/r² = 9·10⁹ · (2·10⁻⁶)(3·10⁻⁶)/0,3² = <b>0,6 N</b>. Deux charges positives : <b>répulsive</b>, le long de la droite qui les joint.'},
+{t:'Jouer avec r et q',s:2,st:'Que devient la force de Coulomb si : (a) on double la distance ? (b) on double une des charges ? (c) on double les deux ?',
+ sol:'(a) F ∝ 1/r² : doubler r ⇒ F divisée par <b>4</b>. (b) F ∝ q₁q₂ : F <b>×2</b>. (c) F <b>×4</b>. Le réflexe « inverse du carré » est le même que pour la gravitation.'},
+{t:'Champ électrique d\u2019une charge',s:3,st:'Quel champ E crée une charge <b>Q = 5 μC</b> à <b>r = 20 cm</b> ? Quelle force subit alors une petite charge <b>q = 1 nC</b> placée là ?',
+ d:function(){var C={x:W*.36,y:H*.52};chg(C.x,C.y,15,1);
+  for(var i=0;i<8;i++){var a=i*PI/4;A(C.x+24*Math.cos(a),C.y+24*Math.sin(a),32*Math.cos(a),32*Math.sin(a),'#c98a8a','',1.8);}
+  DOT(W*.78,C.y,5,BLUE_D);A(W*.78,C.y,52,0,BLUE,'Ē ?',2.4);TB('P (r = 20 cm)',W*.78,C.y+28,GREY,11);},
+ sol:'E = kQ/r² = 9·10⁹·5·10⁻⁶/0,04 = <b>1,1·10⁶ N/C</b>, radial et sortant (Q > 0). Force : F = qE = 10⁻⁹·1,1·10⁶ = <b>1,1·10⁻³ N</b>, dans le sens de Ē (q > 0).'},
+{t:'Point d\u2019équilibre entre deux charges',s:4,st:'Deux charges <b>+4q</b> et <b>+q</b> sont séparées de <b>d</b>. Où placer une charge test sur la droite qui les joint pour qu\u2019elle soit à l\u2019équilibre ?',
+ d:function(){var y=H*.5;LN(W*.12,y,W*.88,y,AX,1.4);chg(W*.2,y,16,1);TB('4q',W*.2,y-34,DRED,12);chg(W*.8,y,11,1);TB('q',W*.8,y-28,DRED,12);
+  DOT(W*.62,y,5,DGREEN);TB('P ?',W*.62,y-18,DGREEN,12);
+  A(W*.62,y-9,38,0,'#c98a8a','',2);A(W*.62,y+9,-38,0,'#c98a8a','',2);
+  LN(W*.2,y+46,W*.62,y+46,GREEN,1.5,[5,4]);TB('x = ?',W*.41,y+64,DGREEN,12);},
+ sol:'Entre les deux (les répulsions s\u2019opposent). Équilibre : k·4q/x² = k·q/(d−x)² ⇒ 2/x = 1/(d−x) ⇒ 2(d−x) = x ⇒ <b>x = 2d/3</b> depuis la charge 4q : plus près de la petite charge.'},
+{t:'Deux boules suspendues (examen)',s:5,st:'Deux petites boules identiques (<b>m = 0,1 g</b>) pendent du même point par des fils de <b>50 cm</b>. Chargées identiquement (q), chaque fil s\u2019écarte de <b>θ = 10°</b> de la verticale. Calcule q.',
+ d:function(){var P={x:W*.5,y:H*.1},L=H*.6,th=10*D2R;floor(P.x-70,P.x+70,P.y);
+  LN(P.x,P.y,P.x,P.y+L*.72,AX,1.2,[4,4]);T('θ',P.x+14,P.y+42,GREY);
+  var b1={x:P.x-L*Math.sin(th),y:P.y+L*Math.cos(th)},b2={x:P.x+L*Math.sin(th),y:P.y+L*Math.cos(th)};
+  LN(P.x,P.y,b1.x,b1.y,'#7f8790',2);LN(P.x,P.y,b2.x,b2.y,'#7f8790',2);
+  chg(b1.x,b1.y,12,1);chg(b2.x,b2.y,12,1);
+  A(b1.x-16,b1.y,-52,0,ORA2,'F̄c',2.2);A(b2.x+16,b2.y,52,0,ORA2,'F̄c',2.2);
+  A(b2.x,b2.y+16,0,46,YEL,'mḡ',2);},
+ sol:'Chaque boule : T·cosθ = mg et T·sinθ = F_C ⇒ F_C = mg·tanθ = 10⁻⁴·9,81·tan10° = 1,73·10⁻⁴ N. Distance entre boules : r = 2L·sinθ = 0,174 m. Coulomb : q = √(F·r²/k) = √(1,73·10⁻⁴·0,0302/9·10⁹) ≈ <b>2,4·10⁻⁸ C ≈ 24 nC</b>.'}
+]},
+
+/* ---------- 12. MAGNETISME ---------- */
+{t:'Magnétisme',
+ic:function(){xfield(W*.18,H*.18,W*.82,H*.84,W*.14);ctx.strokeStyle=AX;ctx.setLineDash([5,4]);ctx.beginPath();ctx.arc(W*.5,H*.52,H*.3,0,7);ctx.stroke();ctx.setLineDash([]);var a=-.7,x=W*.5+H*.3*Math.cos(a),y=H*.52+H*.3*Math.sin(a);DOT(x,y,6,RED);A(x,y,40*Math.sin(a),-40*Math.cos(a),RED,'',2.2);},
+anim:function(t){var C={x:W*.3,y:H*.52},R=Math.min(W*.19,H*.33);
+ xfield(C.x-R-36,C.y-R-26,C.x+R+36,C.y+R+30,46);
+ ctx.strokeStyle=AX;ctx.setLineDash([5,4]);ctx.beginPath();ctx.arc(C.x,C.y,R,0,7);ctx.stroke();ctx.setLineDash([]);
+ var a=-t*.02,x=C.x+R*Math.cos(a),y=C.y+R*Math.sin(a);
+ DOT(x,y,8,RED);
+ A(x,y,54*Math.sin(a),-54*Math.cos(a),RED,'v̄',2.6);
+ A(x,y,(C.x-x)*.42,(C.y-y)*.42,GREEN,'F̄',2.6);
+ TB('B̄ entrant dans l\u2019écran (×)',W*.6,H*.2,GREY,12,'left');
+ TB('F̄ = q·v̄ × B̄  (⟂ à v̄ et B̄, main droite)',W*.6,H*.2+26,DGREEN,13,'left');
+ TB('F ⟂ v ⇒ la force ne travaille pas',W*.6,H*.2+50,GREY,12,'left');
+ TB('trajectoire circulaire : R = mv/(qB)',W*.6,H*.2+74,BLUE_D,13,'left');},
+th:'<div class="tcard"><b class="h">Le champ magnétique B̄.</b> Créé par les aimants et par les COURANTS. Unité : le tesla (T). Les lignes de champ sont fermées : elles sortent du pôle N et rentrent au pôle S.</div>'+
+'<div class="tcard"><b class="h">Force de Lorentz (sur une charge).</b> <code>F̄ = q·v̄ × B̄</code> : norme <code>qvB·sinθ</code>, ⟂ à v̄ et à B̄ (main droite ; charge négative ⇒ sens inversé). Comme F ⟂ v, elle ne travaille pas : la vitesse change de direction, pas de norme. Si v ⟂ B : cercle de rayon <code>R = mv/(qB)</code>, période <code>T = 2πm/(qB)</code> indépendante de v.</div>'+
+'<div class="tcard"><b class="h">Force de Laplace (sur un fil).</b> Un fil de longueur L parcouru par I dans B̄ subit <code>F = B·I·L·sinθ</code> (<code>F̄ = I·L̄×B̄</code>). C\u2019est le principe des moteurs et des haut-parleurs.</div>'+
+'<div class="tcard"><b class="h">Champ créé par un courant.</b> Fil infini : <code>B = μ₀I/(2πr)</code> avec <code>μ₀ = 4π·10⁻⁷</code>. Lignes = cercles autour du fil (main droite : pouce = I, doigts = B̄). Deux fils parallèles de même sens s\u2019attirent.</div>',
+ex:[
+{t:'Force de Lorentz',s:1,st:'Un proton (q = 1,6·10⁻¹⁹ C) file à <b>v = 2·10⁶ m/s</b> perpendiculairement à <b>B = 0,5 T</b>. Calcule la force subie. Compare-la à son poids (m = 1,67·10⁻²⁷ kg).',
+ d:function(){xfield(W*.2,H*.18,W*.8,H*.8,52);DOT(W*.42,H*.5,8,RED);A(W*.42+12,H*.5,80,0,RED,'v̄',2.6);A(W*.42,H*.5-12,0,-64,GREEN,'F̄ ?',2.6);TB('B = 0,5 T (entrant ×)',W*.5,H*.94,GREY,11);},
+ sol:'F = qvB = 1,6·10⁻¹⁹·2·10⁶·0,5 = <b>1,6·10⁻¹³ N</b>. Son poids vaut mg ≈ 1,6·10⁻²⁶ N : la force magnétique est <b>10¹³ fois plus grande</b> — on néglige toujours la gravité pour les particules.'},
+{t:'Force de Laplace sur un fil',s:2,st:'Un fil de <b>L = 0,5 m</b> parcouru par <b>I = 3 A</b> est ⟂ à un champ <b>B = 0,4 T</b>. Calcule la force.',
+ d:function(){xfield(W*.2,H*.18,W*.8,H*.78,52);LN(W*.14,H*.52,W*.86,H*.52,INK,4);A(W*.44,H*.52,70,0,ORA2,'I',2.6);A(W*.5,H*.44,0,-60,GREEN,'F̄ ?',2.6);TB('L = 0,5 m dans B = 0,4 T (×)',W*.5,H*.93,GREY,11);},
+ sol:'F = B·I·L = 0,4·3·0,5 = <b>0,6 N</b>, ⟂ au fil et à B̄ (main droite). C\u2019est le principe du moteur électrique.'},
+{t:'Angle et signe de la charge',s:3,st:'Un électron (q = −e) va à <b>v = 10⁶ m/s</b> dans <b>B = 0,2 T</b>, avec un angle de <b>30°</b> entre v̄ et B̄. Calcule F et précise son sens.',
+ d:function(){for(var i=0;i<4;i++)A(W*.16,H*.28+i*H*.15,W*.16,0,'#b7bdc4','',1.8);TB('B̄',W*.36,H*.22,GREY,12);
+  A(W*.28,H*.66,W*.3*Math.cos(-PI/6),W*.3*Math.sin(-PI/6),RED,'v̄ (électron)',2.6);
+  ctx.strokeStyle=GREY;ctx.lineWidth=1.3;ctx.beginPath();ctx.arc(W*.28,H*.66,36,0,-PI/6,true);ctx.stroke();T('30°',W*.28+52,H*.66-12,GREY);
+  DOT(W*.72,H*.66,10,DGREEN,false);DOT(W*.72,H*.66,2.5,DGREEN);TB('F̄ : ⊙ ou ⊗ ?',W*.72,H*.66+30,DGREEN,11);},
+ sol:'F = qvB·sin30° = 1,6·10⁻¹⁹·10⁶·0,2·0,5 = <b>1,6·10⁻¹⁴ N</b>. Ici v̄×B̄ pointe vers l\u2019écran (⊗) ; la charge étant NÉGATIVE, F̄ sort de l\u2019écran (<b>⊙</b>). Toujours penser au signe de q.'},
+{t:'Champ créé par un fil',s:3,st:'Quel champ B règne à <b>r = 5 cm</b> d\u2019un fil rectiligne parcouru par <b>I = 10 A</b> ? Compare au champ terrestre (≈ 50 μT).',
+ d:function(){var x=W*.4;LN(x,H*.12,x,H*.88,INK,4);A(x,H*.34,0,-52,ORA2,'I = 10 A',2.6);
+  for(var r=26;r<=78;r+=26){ctx.strokeStyle='#b7bdc4';ctx.lineWidth=1.6;ctx.beginPath();ctx.ellipse(x,H*.62,r,r*.35,0,0,7);ctx.stroke();}
+  DOT(x+92,H*.62,4.5,BLUE_D);LN(x,H*.62,x+92,H*.62,GREEN,1.4,[5,4]);TB('r = 5 cm',x+46,H*.62+20,DGREEN,11);A(x+92,H*.62,0,-34,BLUE,'B̄ ?',2.2);},
+ sol:'B = μ₀I/(2πr) = 4π·10⁻⁷·10/(2π·0,05) = <b>4·10⁻⁵ T = 40 μT</b> — comparable au champ terrestre ! Les lignes de champ sont des cercles autour du fil (main droite : pouce = I, doigts = B̄).'},
+{t:'Rayon cyclotron',s:4,st:'Le proton de l\u2019exercice 1 (v = 2·10⁶ m/s ⟂ B = 0,5 T, m = 1,67·10⁻²⁷ kg) décrit un cercle. Calcule R et la période. Que remarques-tu sur la période ?',
+ d:function(){xfield(W*.18,H*.12,W*.84,H*.88,54);ctx.strokeStyle=AX;ctx.setLineDash([5,4]);ctx.beginPath();ctx.arc(W*.5,H*.5,H*.3,0,7);ctx.stroke();ctx.setLineDash([]);
+  var a=-.9,x=W*.5+H*.3*Math.cos(a),y=H*.5+H*.3*Math.sin(a);DOT(x,y,7,RED);A(x,y,46*Math.sin(a),-46*Math.cos(a),RED,'v̄',2.4);
+  LN(W*.5,H*.5,W*.5+H*.3,H*.5,GREEN,1.5,[5,4]);TB('R ?',W*.5+H*.15,H*.5+18,DGREEN,12);},
+ sol:'qvB = mv²/R ⇒ R = mv/(qB) = 1,67·10⁻²⁷·2·10⁶/(1,6·10⁻¹⁹·0,5) = <b>4,2 cm</b>. Période : T = 2πm/(qB) = <b>1,3·10⁻⁷ s</b>, <b>indépendante de v</b> — c\u2019est ce qui rend le cyclotron possible.'},
+{t:'Sélecteur de vitesse + spectromètre (examen)',s:5,st:'Dans un sélecteur, <b>E = 2·10⁵ V/m</b> et <b>B = 0,4 T</b> sont croisés. (a) Quelle vitesse passe tout droit ? (b) L\u2019ion (charge +e) entre ensuite dans une zone où seul <b>B = 0,4 T</b> règne et décrit un demi-cercle de rayon <b>R = 13 cm</b>. Calcule sa masse.',
+ d:function(){var y=H*.36;
+  LN(W*.08,y-40,W*.44,y-40,RED,3);TB('+',W*.26,y-50,DRED,13);
+  LN(W*.08,y+40,W*.44,y+40,BLUE,3);TB('\u2212',W*.26,y+58,BLUE_D,13);
+  A(W*.16,y-30,0,56,VIOLET,'Ē',2);xfield(W*.3,y-22,W*.42,y+24,34);
+  A(W*.05,y,W*.42,0,ORA2,'v',2.4);
+  xfield(W*.52,H*.12,W*.92,H*.88,50);
+  var R2=H*.22;ctx.strokeStyle=RED;ctx.lineWidth=2.2;ctx.beginPath();ctx.arc(W*.56,y+R2,R2,-PI/2,PI/2);ctx.stroke();
+  LN(W*.56,y+R2,W*.56+R2,y+R2,GREEN,1.4,[5,4]);TB('R',W*.56+R2*.5,y+R2+18,DGREEN,12);},
+ sol:'(a) Tout droit ⇔ les deux forces se compensent : qE = qvB ⇒ v = E/B = 2·10⁵/0,4 = <b>5·10⁵ m/s</b> — le sélecteur ne laisse passer qu\u2019UNE vitesse. (b) R = mv/(qB) ⇒ m = qBR/v = 1,6·10⁻¹⁹·0,4·0,13/5·10⁵ = <b>1,66·10⁻²⁶ kg ≈ 10 u</b>. C\u2019est le principe du spectromètre de masse.'}
+]},
+
+/* ---------- 13. OPTIQUE ---------- */
+{t:'Optique : Snell-Descartes & lentilles',
+ic:function(){LN(W*.06,H*.5,W*.94,H*.5,AX,1.2,[4,4]);ctx.strokeStyle=BLUE;ctx.lineWidth=2.6;ctx.beginPath();ctx.ellipse(W*.5,H*.5,W*.05,H*.36,0,0,7);ctx.stroke();
+ LN(W*.08,H*.28,W*.5,H*.28,ORA2,2);LN(W*.5,H*.28,W*.84,H*.5,ORA2,2);
+ LN(W*.08,H*.72,W*.5,H*.72,ORA2,2);LN(W*.5,H*.72,W*.84,H*.5,ORA2,2);DOT(W*.84,H*.5,4.5,RED);},
+ctl:'<div class="row"><span class="pill" style="color:#185fa5;border-color:#b5d4f4;">n₁ (haut)</span><input type="range" id="on1" min="1" max="2.4" step="0.05" value="1" style="accent-color:#378ADD"><span class="pill" style="color:#0F6E56;border-color:#79c6a6;">n₂ (bas)</span><input type="range" id="on2" min="1" max="2.4" step="0.05" value="1.5" style="accent-color:#1D9E75"><span class="pill">mets n₁ &gt; n₂ pour voir la réflexion totale</span></div>',
+anim:function(t){var n1=gv('on1',1),n2=gv('on2',1.5);
+ var O={x:W*.4,y:H*.54},L=Math.min(W*.3,H*.4);
+ ctx.fillStyle='rgba(55,138,221,.07)';ctx.fillRect(W*.04,O.y,W*.72,H*.96-O.y);
+ LN(W*.04,O.y,W*.76,O.y,INK,2);
+ LN(O.x,O.y-L-14,O.x,O.y+L+14,AX,1.3,[5,4]);
+ var th1=.12+.62*(1+Math.sin(t*.008));
+ A(O.x-L*Math.sin(th1),O.y-L*Math.cos(th1),L*Math.sin(th1),L*Math.cos(th1),ORA2,'',3);
+ var s2=n1*Math.sin(th1)/n2,tot=s2>1;
+ ctx.globalAlpha=tot?1:.3;A(O.x,O.y,L*.8*Math.sin(th1),-L*.8*Math.cos(th1),ORA2,'',tot?3:2);ctx.globalAlpha=1;
+ ctx.strokeStyle=ORANGE;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(O.x,O.y,44,-PI/2-th1,-PI/2);ctx.stroke();
+ T('θ₁',O.x-60*Math.sin(th1/2),O.y-60*Math.cos(th1/2)+4,ORANGE);
+ if(!tot){var th2=Math.asin(s2);
+  A(O.x,O.y,L*Math.sin(th2),L*Math.cos(th2),RED,'',3);
+  ctx.strokeStyle=DRED;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(O.x,O.y,46,PI/2-th2,PI/2);ctx.stroke();
+  T('θ₂',O.x+62*Math.sin(th2/2),O.y+62*Math.cos(th2/2)+4,DRED);
+  TB('θ₁ = '+(th1/D2R).toFixed(0)+'°   θ₂ = '+(th2/D2R).toFixed(0)+'°',W*.5,H*.97,GREY,12);}
+ else{TB('RÉFLEXION TOTALE !',W*.4,O.y+L*.6,DRED,14);
+  TB('θ₁ = '+(th1/D2R).toFixed(0)+'° > θc = '+(Math.asin(n2/n1)/D2R).toFixed(0)+'°  (sinθc = n₂/n₁)',W*.5,H*.97,GREY,12);}
+ TB('n₁ = '+n1.toFixed(2),W*.06,O.y-16,BLUE_D,13,'left');
+ TB('n₂ = '+n2.toFixed(2),W*.06,O.y+28,DGREEN,13,'left');
+ TB('n₁·sinθ₁ = n₂·sinθ₂',W*.5,H*.08,BLUE_D,14);},
+th:'<div class="tcard"><b class="h">Indice de réfraction.</b> <code>n = c/v</code> : la lumière ralentit dans un milieu (air ≈ 1, eau = 1,33, verre ≈ 1,5). Réflexion : θ_réfléchi = θ_incident — les angles se mesurent TOUJOURS depuis la <b>normale</b>.</div>'+
+'<div class="tcard"><b class="h">Snell-Descartes.</b> <code>n₁·sinθ₁ = n₂·sinθ₂</code>. Vers un milieu PLUS réfringent (n₂ &gt; n₁) : le rayon se <b>rapproche</b> de la normale ; vers un milieu moins réfringent, il s\u2019en écarte.</div>'+
+'<div class="tcard"><b class="h">Réflexion totale.</b> Possible seulement si n₁ &gt; n₂. Angle critique : <code>sinθc = n₂/n₁</code>. Au-delà, TOUT est réfléchi : c\u2019est le principe des fibres optiques (et des mirages).</div>'+
+'<div class="tcard"><b class="h">Lentilles minces.</b> Rayons clés : ∥ à l\u2019axe → passe par F′ ; par le centre O → non dévié ; par F → ressort ∥. Conjugaison : <code>1/f = 1/dₒ + 1/dᵢ</code> ; grandissement <code>γ = −dᵢ/dₒ</code>. Si dᵢ &lt; 0 : image VIRTUELLE, droite (la loupe). Vergence : <code>C = 1/f</code> (dioptries).</div>',
+ex:[
+{t:'Indice et vitesse',s:1,st:'L\u2019indice du verre vaut <b>n = 1,5</b>. À quelle vitesse la lumière s\u2019y propage-t-elle ? (c = 3·10⁸ m/s)',
+ sol:'v = c/n = 3·10⁸/1,5 = <b>2·10⁸ m/s</b>. Plus le milieu est réfringent, plus la lumière y est lente — c\u2019est la cause physique de la réfraction.'},
+{t:'Snell-Descartes air → eau',s:2,st:'Un rayon arrive de l\u2019air sur de l\u2019eau (<b>n = 1,33</b>) sous <b>θ₁ = 45°</b>. Calcule l\u2019angle de réfraction.',
+ d:function(){var O={x:W*.5,y:H*.52},L=Math.min(W*.3,H*.36);
+  ctx.fillStyle='rgba(55,138,221,.08)';ctx.fillRect(W*.08,O.y,W*.84,H*.92-O.y);
+  LN(W*.08,O.y,W*.92,O.y,INK,2);LN(O.x,O.y-L-14,O.x,O.y+L+14,AX,1.3,[5,4]);
+  var t1=45*D2R,t2=32.1*D2R;
+  A(O.x-L*Math.sin(t1),O.y-L*Math.cos(t1),L*Math.sin(t1),L*Math.cos(t1),ORA2,'',2.8);
+  A(O.x,O.y,L*Math.sin(t2),L*Math.cos(t2),RED,'',2.8);
+  T('45°',O.x-52,O.y-42,ORANGE);T('θ₂ ?',O.x+36,O.y+54,DRED);
+  TB('air (n = 1)',W*.12,O.y-14,GREY,11,'left');TB('eau (n = 1,33)',W*.12,O.y+24,BLUE_D,11,'left');},
+ sol:'sinθ₂ = n₁·sinθ₁/n₂ = sin45°/1,33 = 0,532 ⇒ <b>θ₂ = 32,1°</b>. Le rayon se rapproche de la normale (milieu plus réfringent).'},
+{t:'Angle critique et fibre optique',s:3,st:'Un rayon voyage DANS le verre (<b>n = 1,5</b>) vers l\u2019air. À partir de quel angle d\u2019incidence est-il totalement réfléchi ?',
+ d:function(){var O={x:W*.5,y:H*.56},L=Math.min(W*.28,H*.32);
+  ctx.fillStyle='rgba(55,138,221,.08)';ctx.fillRect(W*.06,H*.12,W*.88,O.y-H*.12);
+  LN(W*.06,O.y,W*.94,O.y,INK,2);LN(O.x,O.y-L-12,O.x,O.y+L*.6,AX,1.3,[5,4]);
+  var tc=41.8*D2R;
+  A(O.x-L*Math.sin(tc),O.y-L*Math.cos(tc),L*Math.sin(tc),L*Math.cos(tc),ORA2,'',2.6);
+  A(O.x,O.y,L*.95,0,RED,'rasant',2.2);
+  A(O.x,O.y,L*.8*Math.sin(tc),-L*.8*Math.cos(tc),'rgba(216,90,48,.5)','réfléchi',2);
+  T('θc ?',O.x-46,O.y-48,ORANGE);TB('verre (n = 1,5)',W*.1,H*.18,BLUE_D,11,'left');TB('air',W*.1,O.y+24,GREY,11,'left');},
+ sol:'À l\u2019angle critique, le réfracté est rasant (θ₂ = 90°) : sinθc = n₂/n₁ = 1/1,5 ⇒ <b>θc = 41,8°</b>. Au-delà : réflexion totale — la lumière reste piégée, c\u2019est la fibre optique.'},
+{t:'Lentille : image réelle',s:3,st:'Un objet est à <b>dₒ = 30 cm</b> d\u2019une lentille convergente de <b>f = 10 cm</b>. Position, nature et taille de l\u2019image ?',
+ d:function(){var ax=H*.6,Lx=W*.48,f=W*.12;
+  LN(W*.04,ax,W*.96,ax,AX,1.3);
+  LN(Lx,ax-H*.36,Lx,ax+H*.3,BLUE,2.4);A(Lx,ax-H*.24,0,-H*.12,BLUE,'',2.2);A(Lx,ax+H*.18,0,H*.12,BLUE,'',2.2);
+  DOT(Lx-f,ax,3.5,GREY);T('F',Lx-f,ax+18,GREY,10);DOT(Lx+f,ax,3.5,GREY);T('F\u2032',Lx+f,ax+18,GREY,10);
+  var ox=Lx-3*f,hy=H*.2,ix=Lx+1.5*f;
+  A(ox,ax,0,-hy,ORA2,'objet',2.6);
+  LN(ox,ax-hy,Lx,ax-hy,GREEN,1.6);LN(Lx,ax-hy,ix,ax+hy*.5,GREEN,1.6);
+  LN(ox,ax-hy,ix,ax+hy*.5,VIOLET,1.4);
+  A(ix,ax,0,hy*.5,RED,'image',2.4);
+  TB('dₒ = 30 cm, f = 10 cm',W*.5,H*.1,GREY,12);},
+ sol:'1/dᵢ = 1/f − 1/dₒ = 1/10 − 1/30 = 2/30 ⇒ <b>dᵢ = 15 cm</b> (image RÉELLE, derrière la lentille). γ = −dᵢ/dₒ = <b>−0,5</b> : renversée, 2× plus petite.'},
+{t:'Lentille : la loupe',s:4,st:'Le même objet est maintenant à <b>dₒ = 6 cm</b> de la lentille (<b>f = 10 cm</b>, objet ENTRE F et la lentille). Position, nature et taille de l\u2019image ?',
+ d:function(){var ax=H*.66,Lx=W*.58,f=W*.15;
+  LN(W*.03,ax,W*.97,ax,AX,1.3);
+  LN(Lx,ax-H*.34,Lx,ax+H*.28,BLUE,2.4);A(Lx,ax-H*.22,0,-H*.12,BLUE,'',2.2);A(Lx,ax+H*.16,0,H*.12,BLUE,'',2.2);
+  DOT(Lx-f,ax,3.5,GREY);T('F',Lx-f,ax+18,GREY,10);
+  var ox=Lx-.6*f,hy=H*.11,ix=Lx-1.5*f;
+  A(ox,ax,0,-hy,ORA2,'',2.4);TB('objet',ox,ax+18,ORA2,11);
+  LN(ox,ax-hy,Lx,ax-hy,GREEN,1.5);LN(Lx,ax-hy,W*.95,ax-hy+(W*.95-Lx)*hy/f,GREEN,1.5);
+  LN(ox,ax-hy,W*.95,ax-hy+(W*.95-ox)*hy/(Lx-ox),VIOLET,1.4);
+  LN(Lx,ax-hy,ix,ax-2.5*hy,'rgba(29,158,117,.5)',1.3,[5,4]);
+  LN(ox,ax-hy,ix,ax-2.5*hy,'rgba(127,119,221,.5)',1.3,[5,4]);
+  LN(ix,ax,ix,ax-2.5*hy,RED,2.2,[6,4]);TB('image virtuelle ×2,5',ix,ax-2.5*hy-12,DRED,11);},
+ sol:'1/dᵢ = 1/10 − 1/6 = −1/15 ⇒ <b>dᵢ = −15 cm</b> : image VIRTUELLE (même côté que l\u2019objet, on la voit « à travers » la lentille). γ = −dᵢ/dₒ = <b>+2,5</b> : droite et agrandie — c\u2019est la loupe.'},
+{t:'Traversée d\u2019une vitre (examen)',s:5,st:'Un rayon frappe une vitre (<b>n = 1,5</b>, épaisseur <b>e = 1 cm</b>) sous <b>θ₁ = 60°</b>. (a) Angle dans le verre ? (b) Montre qu\u2019il ressort PARALLÈLE à sa direction d\u2019entrée. (c) Calcule le décalage latéral d.',
+ d:function(){var y1=H*.34,y2=H*.62,t1=60*D2R,t2=35.3*D2R;
+  ctx.fillStyle='rgba(55,138,221,.08)';ctx.fillRect(W*.08,y1,W*.84,y2-y1);
+  LN(W*.08,y1,W*.92,y1,INK,2);LN(W*.08,y2,W*.92,y2,INK,2);
+  var P1={x:W*.3,y:y1};LN(P1.x,y1-H*.22,P1.x,y1+H*.16,AX,1.2,[4,4]);
+  A(P1.x-Math.sin(t1)*H*.24,y1-Math.cos(t1)*H*.24,Math.sin(t1)*H*.24,Math.cos(t1)*H*.24,ORA2,'',2.6);
+  var P2x=P1.x+Math.tan(t2)*(y2-y1);
+  LN(P1.x,y1,P2x,y2,RED,2.4);
+  A(P2x,y2,Math.sin(t1)*H*.22,Math.cos(t1)*H*.22,ORA2,'',2.6);
+  var Qx=P1.x+Math.tan(t1)*(y2-y1);
+  LN(P1.x,y1,Qx,y2,'rgba(216,90,48,.4)',1.4,[5,4]);
+  LN(P2x,y2+16,Qx,y2+16,GREEN,2);TB('décalage d ?',(P2x+Qx)/2,y2+34,DGREEN,11);
+  T('60°',P1.x-42,y1-32,ORANGE);TB('vitre : n = 1,5, e = 1 cm',W*.5,H*.12,GREY,12);},
+ sol:'(a) sinθ₂ = sin60°/1,5 ⇒ <b>θ₂ = 35,3°</b>. (b) À la sortie : n·sinθ₂ = sinθ₃ = sin60° ⇒ θ₃ = 60° : le rayon ressort <b>parallèle</b>, simplement décalé. (c) d = e·sin(θ₁−θ₂)/cosθ₂ = 0,01·sin(24,7°)/cos(35,3°) ≈ <b>5,1 mm</b>.'}
 ]}
 ];
 
